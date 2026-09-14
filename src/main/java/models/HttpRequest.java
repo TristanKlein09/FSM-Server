@@ -1,6 +1,7 @@
 package models;
 
 import java.io.BufferedReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,14 +17,14 @@ public class HttpRequest {
     private String httpVersion; //HTTP/1.1, HTTP2, etc.
 
     //Headers
-    private List<Header> headers;
-    private Header host; //Host the client is requesting
-    private Header userAgent; //Sort of software made the request
-    private Header accept; //Sort of content the client can accept
-    private Header contentType; //Format of the request body
-    private Header contentLength; //Length of the request body
-    private Header connection; //Connection type (keep-alive, close, etc.)
-    private Header authorization; //Authorization header (if present) - TODO: Figure out if needed
+    private List<String> headers = new ArrayList<>(); //Initialise as an empty list to avoid null pointer exceptions
+    private String host; //Host the client is requesting
+    private String userAgent; //Sort of software made the request
+    private String accept; //Sort of content the client can accept
+    private String contentType; //Format of the request body
+    private String contentLength; //Length of the request body
+    private String connection; //Connection type (keep-alive, close, etc.)
+    private String authorization; //Authorization header (if present) - TODO: Figure out if needed
 
     //Body
     private String body;
@@ -37,24 +38,62 @@ public class HttpRequest {
     private void parseRequest() {
         try {
             //Request line
-            setRequestLine(reader.readLine());
+            this.requestLine = reader.readLine();
             System.out.println("Request line: " + requestLine);
-            String[] requestLineArray = this.requestLine.split( " "); //Splits the request to form an array
+            String[] requestLineArray = this.requestLine.split(" "); //Splits the request to form an array
+
             this.method = requestLineArray[0];
             this.target = requestLineArray[1];
             this.httpVersion = requestLineArray[2];
+
             System.out.println("Method: " + method);
             System.out.println("Target: " + target);
             System.out.println("HTTP Version: " + httpVersion);
 
             //Headers
             String line;
+            //Ends until an empty line is reached - after this there will be body or end of request
             while (!(line = reader.readLine()).isEmpty()) {
+                System.out.println("Header line: " + line);
+                headers.add(line); //Adds the header line to the headers list
+                handleHeaderLine(line);
+
                 System.out.println("Header: " + line);
             }
 
         } catch (Exception e) {
             System.out.println("Error parsing request line: " + e.getMessage());
+        }
+    }
+
+    //Take a header line and finds its corresponding header and sets the value of that header in the HttpRequest object
+    private void handleHeaderLine(String line) {
+        switch (line.split(":")[0].trim()) { //Keeping on the first part of the header line before the colon and trimming it to remove whitespace
+            case "Host":
+                this.host = line.split(":")[1].trim();
+                break;
+            case "User-Agent":
+                this.userAgent = line.split(":")[1].trim();
+                break;
+            case "Accept":
+                this.accept = line.split(":")[1].trim();
+                break;
+            case "Content-Type":
+                this.contentType = line.split(":")[1].trim();
+                break;
+            case "Content-Length":
+                this.contentLength = line.split(":")[1].trim();
+                break;
+            case "Connection":
+                this.connection = line.split(":")[1].trim();
+                break;
+            case "Authorization":
+                this.authorization = line.split(":")[1].trim();
+                break;
+            default:
+                System.out.println("Unknown header: " + line); //TODO: Log unknown headers
+                break;
+
         }
     }
 
@@ -99,67 +138,67 @@ public class HttpRequest {
         this.httpVersion = httpVersion;
     }
 
-    public List<Header> getHeaders() {
+    public List<String> getHeaders() {
         return headers;
     }
 
-    public void setHeaders(List<Header> headers) {
+    public void setHeaders(List<String> headers) {
         this.headers = headers;
     }
 
-    public Header getHost() {
+    public String getHost() {
         return host;
     }
 
-    public void setHost(Header host) {
+    public void setHost(String host) {
         this.host = host;
     }
 
-    public Header getUserAgent() {
+    public String getUserAgent() {
         return userAgent;
     }
 
-    public void setUserAgent(Header userAgent) {
+    public void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
     }
 
-    public Header getAccept() {
+    public String getAccept() {
         return accept;
     }
 
-    public void setAccept(Header accept) {
+    public void setAccept(String accept) {
         this.accept = accept;
     }
 
-    public Header getContentType() {
+    public String getContentType() {
         return contentType;
     }
 
-    public void setContentType(Header contentType) {
+    public void setContentType(String contentType) {
         this.contentType = contentType;
     }
 
-    public Header getContentLength() {
+    public String getContentLength() {
         return contentLength;
     }
 
-    public void setContentLength(Header contentLength) {
+    public void setContentLength(String contentLength) {
         this.contentLength = contentLength;
     }
 
-    public Header getConnection() {
+    public String getConnection() {
         return connection;
     }
 
-    public void setConnection(Header connection) {
+    public void setConnection(String connection) {
         this.connection = connection;
     }
 
-    public Header getAuthorization() {
+    public String getAuthorization() {
         return authorization;
     }
 
-    public void setAuthorization(Header authorization) {
+    public void setAuthorization(String authorization) {
         this.authorization = authorization;
     }
 
