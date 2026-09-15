@@ -2,7 +2,6 @@ package models;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class HttpRequest {
@@ -57,9 +56,16 @@ public class HttpRequest {
                 System.out.println("Header line: " + line);
                 headers.add(line); //Adds the header line to the headers list
                 handleHeaderLine(line);
-
-                System.out.println("Header: " + line);
             }
+
+            //Body
+            //TODO: Put in method
+            int length = Integer.parseInt(contentLength); //Gets the content length from the header
+            char [] bodyChars = new char[length]; //Creates a char array with length as specified by content length header
+            reader.read(bodyChars, 0, length);
+            this.body = new String(bodyChars); //Converts the char array to a string
+            System.out.println("Body: " + body);
+
 
         } catch (Exception e) {
             System.out.println("Error parsing request line: " + e.getMessage());
