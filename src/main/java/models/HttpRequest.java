@@ -1,6 +1,7 @@
 package models;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,14 +31,29 @@ public class HttpRequest {
 
     public HttpRequest(BufferedReader reader) {
         this.reader = reader;
-        //TODO: Read the request from the BufferedReader and initialize the fields
         parseRequest();
     }
 
     private void parseRequest() {
         try {
             //Request line
-            this.requestLine = reader.readLine();
+            parseRequestLine();
+
+            //Headers
+            parseHeaders();
+
+            //Body
+            parseBody();
+
+        } catch (Exception e) {
+            System.out.println("Error parsing request line: " + e.getMessage());
+        }
+    }
+
+    //Parses the request line and sets values of the corresponding attributes
+    private void parseRequestLine() throws IOException {
+        try {
+            this.requestLine = this.reader.readLine();
             System.out.println("Request line: " + requestLine);
             String[] requestLineArray = this.requestLine.split(" "); //Splits the request to form an array
 
@@ -48,25 +64,6 @@ public class HttpRequest {
             System.out.println("Method: " + method);
             System.out.println("Target: " + target);
             System.out.println("HTTP Version: " + httpVersion);
-
-            //Headers
-            String line;
-            //Ends until an empty line is reached - after this there will be body or end of request
-            while (!(line = reader.readLine()).isEmpty()) {
-                System.out.println("Header line: " + line);
-                headers.add(line); //Adds the header line to the headers list
-                handleHeaderLine(line);
-            }
-
-            //Body
-            //TODO: Put in method
-            int length = Integer.parseInt(contentLength); //Gets the content length from the header
-            char [] bodyChars = new char[length]; //Creates a char array with length as specified by content length header
-            reader.read(bodyChars, 0, length);
-            this.body = new String(bodyChars); //Converts the char array to a string
-            System.out.println("Body: " + body);
-
-
         } catch (Exception e) {
             System.out.println("Error parsing request line: " + e.getMessage());
         }
@@ -102,6 +99,35 @@ public class HttpRequest {
 
         }
     }
+
+    //Fully parses the headers and sets the values of the corresponding attributes
+    private void parseHeaders() throws IOException {
+        try {
+            String line;
+            //Ends until an empty line is reached - after this there will be body or end of request
+            while (!(line = reader.readLine()).isEmpty()) {
+                System.out.println("Header line: " + line);
+                headers.add(line); //Adds the header line to the headers list
+                handleHeaderLine(line);
+            }
+        } catch (Exception e) {
+            System.out.println("Error parsing headers: " + e);
+        }
+    }
+
+    //Fully parses the body and sets its contents to the corresponding attribute
+    private void parseBody() throws IOException {
+        try {
+            int length = Integer.parseInt(contentLength); //Gets the content length from the header
+            char [] bodyChars = new char[length]; //Creates a char array with length as specified by content length header
+            reader.read(bodyChars, 0, length);
+            this.body = new String(bodyChars); //Converts the char array to a string
+            System.out.println("Body: " + body);
+        } catch (Exception e) {
+            System.out.println("Error parsing body: " + e);
+        }
+    }
+
 
     //Getters and Setters
     public String getRequest() {

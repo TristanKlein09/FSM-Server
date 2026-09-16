@@ -13,8 +13,6 @@ public class RequestHandler {
         HttpRequest request = createRequestObj();
     }
 
-
-
     public HttpRequest createRequestObj() {
         return new HttpRequest(reader);
     }
