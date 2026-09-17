@@ -1,12 +1,14 @@
+import models.HttpResponse;
+import models.HttpStatus;
 import server.RequestHandler;
 import util.Util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+
+//TODO: Add enums for the methods
 
 public class Main {
      static int port = 9191; //Specifies the port to listen on
@@ -26,6 +28,22 @@ public class Main {
             //Read message from client
             BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             RequestHandler requestHandler = new RequestHandler(reader);
+
+            OutputStream outputStream = clientSocket.getOutputStream(); //Get output stream to send data to client
+
+            byte[] body = "Hello World!".getBytes(StandardCharsets.UTF_8); //Splitting it into bytes
+
+            String response1 =
+                    "HTTP/1.1 200 OK\r\n" +
+                            "Content-Type: text/plain\r\n" +
+                            "Content-Length: " + body.length + "\r\n" +
+                            "\r\n";
+
+            HttpResponse responseObj = new HttpResponse(HttpStatus.OK, "text/plain", "close", body);
+
+            outputStream.write(responseObj.responseBytes);
+            outputStream.write(responseObj.body);
+            outputStream.flush();
 
             //Close the sockets
             reader.close();
