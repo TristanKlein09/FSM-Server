@@ -72,26 +72,27 @@ public class HttpRequest {
     //Take a header line and finds its corresponding header and sets the value of that header in the HttpRequest object
     private void handleHeaderLine(String line) {
         switch (line.split(":")[0].trim().toLowerCase()) { //Keeping on the first part of the header line before the colon and trimming it to remove whitespace
+            //After fix
             case "host":
-                this.host = line.split(":")[1].trim();
+                this.host = line.substring(line.indexOf(":") + 1).trim();
                 break;
             case "user-agent":
-                this.userAgent = line.split(":")[1].trim();
+                this.userAgent = line.substring(line.indexOf(":") + 1).trim();
                 break;
             case "accept":
-                this.accept = line.split(":")[1].trim();
+                this.accept = line.substring(line.indexOf(":") + 1).trim();
                 break;
             case "content-type":
-                this.contentType = line.split(":")[1].trim();
+                this.contentType = line.substring(line.indexOf(":") + 1).trim();
                 break;
             case "content-length":
-                this.contentLength = line.split(":")[1].trim();
+                this.contentLength = line.substring(line.indexOf(":") + 1).trim();
                 break;
             case "connection":
-                this.connection = line.split(":")[1].trim();
+                this.connection = line.substring(line.indexOf(":") + 1).trim();
                 break;
             case "authorization":
-                this.authorization = line.split(":")[1].trim();
+                this.authorization = line.substring(line.indexOf(":") + 1).trim();
                 break;
             default:
                 System.out.println("Unknown header: " + line); //TODO: Log unknown headers

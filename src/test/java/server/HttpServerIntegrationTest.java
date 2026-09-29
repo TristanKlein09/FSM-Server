@@ -10,32 +10,34 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Integration test - starts the real server and sends it a real request.
-// Port 6173 needs to be free, so make sure the server isn't already running.
-class HttpServerIntegrationTest {
 
+class HttpServerIntegrationTest {
+    private static final String CRLF = "\r\n";
+
+    //An integration server which starts a server and sends correct response
     @Test
-    @DisplayName("I1: server responds to a GET request with 200 OK")
-    void serverRespondsToGetRequest() throws Exception {
-        // startServer() blocks, so it needs to run on its own thread
-        Thread serverThread = new Thread(() -> {
+    @DisplayName("I1: The server responds with a valid response containing 200 OK (valid)")
+    void serverRespondsToRequestValid() throws Exception {
+        //A new thread must be created because starting the server blocks the main thread
+        //meaning the test wont be able to run
+        Thread serverThread = new Thread(() -> { //Creating a new thread
             try {
                 new HttpServer(6173).startServer();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("An error occurred while starting the server" + e.getMessage());
             }
         });
-        serverThread.start();
 
-        Thread.sleep(500); // give the server a moment to start listening
+        serverThread.start(); //Actually starting the new thread
 
-        Socket socket = new Socket("localhost", 6173);
-        OutputStream out = socket.getOutputStream();
-        out.write("GET / HTTP/1.1\r\nHost: localhost\r\n\r\n".getBytes(StandardCharsets.UTF_8));
-        out.flush();
+        Socket testSocket = new Socket("localhost", 6173);
 
-        String response = new String(socket.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        socket.close();
+        //Simulating a request that a console would send by using the output stream
+        OutputStream outputStream = testSocket.getOutputStream();
+        outputStream.write(("GET / HTTP/1.1" + CRLF + "Host: localhost" + CRLF + CRLF).getBytes(StandardCharsets.UTF_8));
+
+        //Getting response from the server
+        String response = new String(testSocket.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
         assertTrue(response.startsWith("HTTP/1.1 200 OK"));
         assertTrue(response.contains("Content-Length: 4"));
