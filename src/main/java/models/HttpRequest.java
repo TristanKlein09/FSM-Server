@@ -71,26 +71,26 @@ public class HttpRequest {
 
     //Take a header line and finds its corresponding header and sets the value of that header in the HttpRequest object
     private void handleHeaderLine(String line) {
-        switch (line.split(":")[0].trim()) { //Keeping on the first part of the header line before the colon and trimming it to remove whitespace
-            case "Host":
+        switch (line.split(":")[0].trim().toLowerCase()) { //Keeping on the first part of the header line before the colon and trimming it to remove whitespace
+            case "host":
                 this.host = line.split(":")[1].trim();
                 break;
-            case "User-Agent":
+            case "user-agent":
                 this.userAgent = line.split(":")[1].trim();
                 break;
-            case "Accept":
+            case "accept":
                 this.accept = line.split(":")[1].trim();
                 break;
-            case "Content-Type":
+            case "content-type":
                 this.contentType = line.split(":")[1].trim();
                 break;
-            case "Content-Length":
+            case "content-length":
                 this.contentLength = line.split(":")[1].trim();
                 break;
-            case "Connection":
+            case "connection":
                 this.connection = line.split(":")[1].trim();
                 break;
-            case "Authorization":
+            case "authorization":
                 this.authorization = line.split(":")[1].trim();
                 break;
             default:

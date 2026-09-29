@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 
 public class HttpServer {
     private int port; //Specifies the port to listen on
-    static String crlf = "\r\n"; //Specifies the carriage return and line feed characters used in requests
 
     public HttpServer(int port) {
         this.port = port;
@@ -34,7 +33,7 @@ public class HttpServer {
 
             OutputStream outputStream = clientSocket.getOutputStream(); //Get output stream to send data to client
 
-            byte[] body = "Hello World!".getBytes(StandardCharsets.UTF_8); //Splitting it into bytes
+            byte[] body = "Test".getBytes(StandardCharsets.UTF_8); //Splitting it into bytes
 
             HttpResponse responseObj = new HttpResponse(HttpStatus.OK, "text/plain", "close", body);
 
@@ -46,7 +45,6 @@ public class HttpServer {
             reader.close();
             clientSocket.close();
             serverSocket.close();
-
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage()); //Output the error
         }
