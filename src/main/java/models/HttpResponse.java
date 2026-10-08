@@ -3,8 +3,9 @@ package models;
 import util.Util;
 import java.nio.charset.StandardCharsets;
 
+//TODO: Change attributes to private and add getters and setters
 public class HttpResponse {
-    private String crlf = "\r\n";
+    private final String CRLF = "\r\n";
     public String response;
     public byte[] responseBytes;
 
@@ -38,16 +39,16 @@ public class HttpResponse {
 
     private void createResponse() {
         this.response = this.statusLine +
-                "Content-Type: " + this.contentType + crlf +
-                "Content-Length: " + this.contentLength + crlf +
-                crlf;
-        System.out.println(this.response);
+                "Content-Type: " + this.contentType + CRLF +
+                "Content-Length: " + this.contentLength + CRLF +
+                CRLF;
+        //System.out.println(this.response);
 
         this.responseBytes = this.response.getBytes(StandardCharsets.UTF_8);
     }
 
     private void createStatusLine() {
-        this.statusLine = httpVersion + " " + status.getCode() + " " + status.getReasonPhrase() + crlf;
-        System.out.println(this.statusLine);
+        this.statusLine = httpVersion + " " + status.getCode() + " " + status.getReasonPhrase() + CRLF;
+        //System.out.println(this.statusLine);
     }
 }

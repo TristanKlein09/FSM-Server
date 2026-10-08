@@ -53,17 +53,18 @@ public class HttpRequest {
     //Parses the request line and sets values of the corresponding attributes
     private void parseRequestLine() throws IOException {
         try {
+            //Only one line, no need to iterate through it
             this.requestLine = this.reader.readLine();
-            System.out.println("Request line: " + requestLine);
+            //System.out.println("Request line: " + requestLine);
             String[] requestLineArray = this.requestLine.split(" "); //Splits the request to form an array
 
             this.method = requestLineArray[0];
             this.target = requestLineArray[1];
             this.httpVersion = requestLineArray[2];
 
-            System.out.println("Method: " + method);
-            System.out.println("Target: " + target);
-            System.out.println("HTTP Version: " + httpVersion);
+            //System.out.println("Method: " + method);
+            //System.out.println("Target: " + target);
+            //System.out.println("HTTP Version: " + httpVersion);
         } catch (Exception e) {
             System.out.println("Error parsing request line: " + e.getMessage());
         }
@@ -72,7 +73,6 @@ public class HttpRequest {
     //Take a header line and finds its corresponding header and sets the value of that header in the HttpRequest object
     private void handleHeaderLine(String line) {
         switch (line.split(":")[0].trim().toLowerCase()) { //Keeping on the first part of the header line before the colon and trimming it to remove whitespace
-            //After fix
             case "host":
                 this.host = line.substring(line.indexOf(":") + 1).trim();
                 break;
@@ -101,29 +101,30 @@ public class HttpRequest {
         }
     }
 
-    //Fully parses the headers and sets the values of the corresponding attributes
+    //Parses the headers and calls a method to set values to the corresponding attributes
     private void parseHeaders() throws IOException {
         try {
             String line;
-            //Ends until an empty line is reached - after this there will be body or end of request
+            //Ends until an empty line is reached - after this there will be body
             while (!(line = reader.readLine()).isEmpty()) {
-                System.out.println("Header line: " + line);
+                //System.out.println("Header line: " + line);
                 headers.add(line); //Adds the header line to the headers list
                 handleHeaderLine(line);
             }
         } catch (Exception e) {
-            System.out.println("Error parsing headers: " + e);
+            System.out.println("Error parsing headers: " + e.getMessage());
         }
     }
 
     //Fully parses the body and sets its contents to the corresponding attribute
     private void parseBody() throws IOException {
         try {
-            int length = Integer.parseInt(contentLength); //Gets the content length from the header
-            char [] bodyChars = new char[length]; //Creates a char array with length as specified by content length header
+            //TODO: Check if we need length, it could be replaced by just this.contentLength
+            int length = Integer.parseInt(this.contentLength); //Gets the content length from the header
+            char[] bodyChars = new char[length]; //Creates a char array with length as specified by content length header
             reader.read(bodyChars, 0, length);
             this.body = new String(bodyChars); //Converts the char array to a string
-            System.out.println("Body: " + body);
+            //System.out.println("Body: " + body);
         } catch (Exception e) {
             System.out.println("Error parsing body: " + e);
         }
