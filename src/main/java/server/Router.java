@@ -12,8 +12,6 @@ public class Router {
 
     public Router(BufferedReader reader) {
         this.reader = reader;
-
-        HttpRequest request = createRequestObj();
     }
 
     //TODO: This is completely useless - fix it
@@ -33,7 +31,7 @@ public class Router {
                 response = server.userLogin(request);
                 break;
             case "/registerUser":
-                server.registerUser(request);
+                response = server.registerUser(request);
                 break;
             default:
                 System.out.println("Error in Router.routeRequest(): Unrecognised target");

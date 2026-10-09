@@ -2,10 +2,13 @@ package server;
 
 import com.google.gson.Gson;
 import json.jsonLogin;
+import json.jsonRegisterUser;
 import login.AuthService;
+import login.User;
 import models.HttpRequest;
 import models.HttpResponse;
 import models.HttpStatus;
+import util.Util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,41 +27,54 @@ public class HttpServer {
 
     private HttpServer() {}
 
+    //Simply starts the server
     public void startServer() throws IOException {
         try {
-            //Open server socket on the port to listen for connections
             ServerSocket serverSocket = new ServerSocket(this.port);
+            System.out.println("Server started on port " + this.port);
 
-            //Accept connection from client
-            Socket clientSocket = serverSocket.accept();
-            System.out.println("Client connected: " + clientSocket.getInetAddress());
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("Client connected: " + clientSocket.getInetAddress());
+                handleClient(clientSocket);
+            }
 
+            //TODO: Add print statements to the exceptions
+        } catch (Exception e) {
+            HttpResponse response = Util.handleException(e, "HttpServer.startServer()");
+        }
+    }
+
+    //Handles the client connection
+    private void handleClient(Socket clientSocket) {
+        try {
             //Read message from client
             BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            Router router = new Router(reader);
-            HttpRequest request = router.createRequestObj();
-
             OutputStream outputStream = clientSocket.getOutputStream(); //Get output stream to send data to client
 
-            HttpResponse response = router.routeRequest(request);
+            while (true) {
+                Router router = new Router(reader);
+                HttpRequest request = router.createRequestObj();
+                HttpResponse response = router.routeRequest(request); //Create the response based on the request
 
-            outputStream.write(response.responseBytes);
-            outputStream.write(response.body);
-            outputStream.flush();
+                //Flushing the streams
+                outputStream.write(response.responseBytes);
+                outputStream.write(response.body);
+                outputStream.flush();
 
-            //Close the sockets
-            reader.close();
-            clientSocket.close();
-            serverSocket.close();
-            //TODO: Add print statements to the exceptions
-        } catch (IOException e) {
-            System.out.println("Error: " + e.getMessage()); //Output the error
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+                //Check connection header to see if the connection should close
+                if (request.getConnection().equalsIgnoreCase("close")) {
+                    System.out.println("Closing connection with client: " + clientSocket.getInetAddress());
+                    reader.close();
+                    outputStream.close();
+                    clientSocket.close();
+                    break;
+                }
+
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error handling client: " + e.getMessage());
         }
     }
 
@@ -82,9 +98,31 @@ public class HttpServer {
         return response;
     }
 
-    public void registerUser(HttpRequest request) {
+    //TODO: This only works if the specified content type is json
+    public HttpResponse registerUser(HttpRequest request) throws ExecutionException, InterruptedException, SQLException {
+        HttpResponse response;
 
+        try {
+            AuthService authService = new AuthService();
+            Gson gson = new Gson();
+
+            String body = request.getBody();
+            jsonRegisterUser userProperties = gson.fromJson(body, jsonRegisterUser.class);
+            String passwordHash = Util.hashPlainText(userProperties.getPassword());
+
+            //Replace password with the password hash
+            User user = new User(userProperties.getUsername(), passwordHash, userProperties.getFirstName(), userProperties.getLastName(), userProperties.getPermissions());
+            user = authService.registerUser(user);
+
+            response = new HttpResponse(HttpStatus.CREATED, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+
+        } catch (Exception e) {
+            response = Util.handleException(e, "HttpServer.registerUser()");
+        }
+
+        return response;
     }
+
 
     //Getters and setters
     public static HttpServer getInstance() {

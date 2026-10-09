@@ -1,9 +1,12 @@
 package util;
 
+import models.HttpResponse;
+import models.HttpStatus;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -33,6 +36,13 @@ public class Util {
 
         String hashedText = future.get();
         return hashedText;
+    }
+
+    //Handles any incoming exceptions by returning the HttpResponse that should be sent to the client
+    public static HttpResponse handleException(Exception e, String methodName) {
+        HttpResponse httpResponse = new HttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, "text/plain", "keep-alive", (e.toString() + " in method: " + methodName).getBytes(StandardCharsets.UTF_8));
+        System.out.println("Error in: " + methodName + ": " + e.getMessage());
+        return httpResponse;
     }
 
 }
