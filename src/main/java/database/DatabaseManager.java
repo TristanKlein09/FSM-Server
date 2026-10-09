@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseManager {
+    //TODO: Add some functions to create the tables, so that when a new person sets up the server for the first time they can just call the functions
     private static final String usersDbUrl = "jdbc:sqlite:users.sqlite";
 
     //Opens a connection to the users.sqlite database

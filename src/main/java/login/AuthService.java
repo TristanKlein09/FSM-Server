@@ -16,8 +16,6 @@ public class AuthService {
     //Checks if the sent username and password are correct
     //Password is sent over https, it then gets hashed and compared to the hash in the database
 
-    //TODO: Return status code 401 unauthorized to client if password is incorrect and 202(check this) if password is correct
-
     //TODO: Remember that when implementing this function it must be run on its own thread due to SQL as well
     //Gets the hashedPassword that corresponds to the username and checks if it matches the password parameter
     //Returns true is password is correct, false if incorrect
