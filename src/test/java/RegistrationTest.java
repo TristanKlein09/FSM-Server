@@ -38,7 +38,6 @@ class RegistrationTest {
     @Test
     @DisplayName("Re2.1: Missing username returns 400 and saves nothing (invalid)")
     void noUsername() throws Exception {
-        // Arrange (same as Re1 but with no username)
         String body = "{\"password\":\"password123\","
                 + "\"firstName\":\"Richard\",\"lastName\":\"Grayson\",\"permissions\":\"TECHNICIAN\"}";
 

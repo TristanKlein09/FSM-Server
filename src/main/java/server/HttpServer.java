@@ -120,14 +120,24 @@ public class HttpServer {
 
             String body = request.getBody();
             jsonRegisterUser userProperties = gson.fromJson(body, jsonRegisterUser.class);
-            String passwordHash = Util.hashPlainText(userProperties.getPassword());
 
-            //Replace password with the password hash
-            User user = new User(userProperties.getUsername(), passwordHash, userProperties.getFirstName(), userProperties.getLastName(), userProperties.getPermissions());
-            user = authService.registerUser(user);
+            //If any of the fields are null or empty, return a 400 Bad Request response
+            if (userProperties.getUsername() == null || userProperties.getUsername().isEmpty()
+                    || userProperties.getPassword() == null || userProperties.getPassword().isEmpty()
+                    || userProperties.getFirstName() == null || userProperties.getFirstName().isEmpty()
+                    || userProperties.getLastName() == null || userProperties.getLastName().isEmpty()
+                    || userProperties.getPermissions() == null)
+            {
+                response = new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+            } else {
+                String passwordHash = Util.hashPlainText(userProperties.getPassword());
 
-            response = new HttpResponse(HttpStatus.CREATED, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+                //Replace password with the password hash
+                User user = new User(userProperties.getUsername(), passwordHash, userProperties.getFirstName(), userProperties.getLastName(), userProperties.getPermissions());
+                user = authService.registerUser(user);
 
+                response = new HttpResponse(HttpStatus.CREATED, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+            }
         } catch (Exception e) {
             response = Util.handleException(e, "HttpServer.registerUser()");
         }
