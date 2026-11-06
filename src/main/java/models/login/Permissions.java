@@ -1,4 +1,4 @@
-package login;
+package models.login;
 
 public enum Permissions {
     //The values are used to help store the permission in the database as a string/text

@@ -1,11 +1,9 @@
 package util;
 
-import models.HttpResponse;
-import models.HttpStatus;
+import models.server.HttpResponse;
+import models.server.HttpStatus;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

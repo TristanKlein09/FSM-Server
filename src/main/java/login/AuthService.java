@@ -1,6 +1,7 @@
 package login;
 
 import database.DatabaseManager;
+import models.login.User;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;

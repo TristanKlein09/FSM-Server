@@ -1,4 +1,4 @@
-package models;
+package models.server;
 
 import util.Util;
 import java.nio.charset.StandardCharsets;

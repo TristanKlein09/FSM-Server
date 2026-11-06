@@ -1,13 +1,13 @@
 package server;
 
 import com.google.gson.Gson;
-import json.jsonLogin;
-import json.jsonRegisterUser;
+import models.json.jsonLogin;
+import models.json.jsonRegisterUser;
 import login.AuthService;
-import login.User;
-import models.HttpRequest;
-import models.HttpResponse;
-import models.HttpStatus;
+import models.login.User;
+import models.server.HttpRequest;
+import models.server.HttpResponse;
+import models.server.HttpStatus;
 import util.Util;
 
 import java.io.BufferedReader;
@@ -56,11 +56,21 @@ public class HttpServer {
                 Router router = new Router(reader);
                 HttpRequest request = router.createRequestObj();
                 HttpResponse response = router.routeRequest(request); //Create the response based on the request
+                System.out.println(response.statusLine);
 
                 //Flushing the streams
-                outputStream.write(response.responseBytes);
-                outputStream.write(response.body);
-                outputStream.flush();
+                //TODO: Check if we need a thread here or not
+                new Thread(() -> {
+                    try {
+                        outputStream.write(response.responseBytes);
+                        outputStream.write(response.body);
+                        outputStream.flush();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                }).start();
+
 
                 //Check connection header to see if the connection should close
                 if (request.getConnection().equalsIgnoreCase("close")) {
@@ -77,6 +87,8 @@ public class HttpServer {
             System.out.println("Error handling client: " + e.getMessage());
         }
     }
+
+    //----- HTTP RESPONSES -----
 
     //TODO: This only works if the specified content type is json
     public HttpResponse userLogin(HttpRequest request) throws SQLException, ExecutionException, InterruptedException {
@@ -122,6 +134,37 @@ public class HttpServer {
 
         return response;
     }
+
+    /**
+     * The response that is sent when the client wants to check if they can successfully establish a connection with the client.
+     * @return {@link HttpResponse} with status code 200 and an empty body.
+     */
+    public HttpResponse checkConnectionResponse() {
+        HttpResponse response;
+        response = new HttpResponse(HttpStatus.OK, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+        return response;
+    }
+
+    /**
+     *
+     * @param target The target the user is trying to access.
+     * @return {@link HttpResponse} with status code 404 and body "Target: ... not found"
+     */
+    public HttpResponse unrecognisedTarget(String target) {
+        return new HttpResponse(HttpStatus.NOT_FOUND, "text/plain", "keep-alive", ("Target: " + target + " not found").getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Returns a 405 Method Not Allowed response.
+     * @param request
+     * @return {@link HttpResponse} with status code 405 and body "Method: ... not allowed with target: ..."
+     */
+    public HttpResponse methodNotAllowed(HttpRequest request) {
+        return new HttpResponse(HttpStatus.METHOD_NOT_ALLOWED, "text/plain", "keep-alive",
+                ("Method: " + request.getMethod() + " not allowed with target: " + request.getTarget()).getBytes(StandardCharsets.UTF_8));
+    }
+
+
 
 
     //Getters and setters

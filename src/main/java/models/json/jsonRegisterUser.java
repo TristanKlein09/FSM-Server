@@ -1,6 +1,6 @@
-package json;
+package models.json;
 
-import login.Permissions;
+import models.login.Permissions;
 
 public class jsonRegisterUser {
     private String username;

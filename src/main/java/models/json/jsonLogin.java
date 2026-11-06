@@ -1,4 +1,4 @@
-package json;
+package models.json;
 
 public class jsonLogin {
     //To serialise json we must make objects
