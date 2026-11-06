@@ -18,14 +18,32 @@ public class AuthService {
     //Password is sent over https, it then gets hashed and compared to the hash in the database
 
     //TODO: Remember that when implementing this function it must be run on its own thread due to SQL as well
+
     //Gets the hashedPassword that corresponds to the username and checks if it matches the password parameter
+    //Also checks if the username exists in the database, if it does not, it returns false
     //Returns true is password is correct, false if incorrect
     public boolean authenticate(String username, String password) throws SQLException, ExecutionException, InterruptedException {
-        //Get the hashed password from the database that corresponds to the username
+        //Check if the username exists in the database, if it does not, return false
         Connection usersConnection = DatabaseManager.connectUsersDb();
-        String getHashedPass = "SELECT password_hash FROM userLogins WHERE username = (?)";
+        //Works by runnning a select query and checks how many rows are returned, if it is 0, the username does not exist
+        String checkUsernameExists = "SELECT 1 FROM userLogins WHERE username = (?) LIMIT 1"; //Only return one row
         assert usersConnection != null; //usersConnection cannot be null
-        PreparedStatement prepStmtGetHashedPass = usersConnection.prepareStatement(getHashedPass);
+        PreparedStatement prepStmtCheckUsername = usersConnection.prepareStatement(checkUsernameExists);
+        prepStmtCheckUsername.setString(1, username);
+        ResultSet rsCheckUsername = prepStmtCheckUsername.executeQuery();
+
+        if (!rsCheckUsername.next()) { //If the result set is empty, the username does not exist
+            System.out.println("Username does not exist");
+            return false;
+        }
+        rsCheckUsername.close();
+
+
+        //Get the hashed password from the database that corresponds to the username
+        Connection usersConnection2 = DatabaseManager.connectUsersDb();
+        String getHashedPass = "SELECT password_hash FROM userLogins WHERE username = (?)";
+        assert usersConnection2 != null; //usersConnection cannot be null
+        PreparedStatement prepStmtGetHashedPass = usersConnection2.prepareStatement(getHashedPass);
         prepStmtGetHashedPass.setString(1, username);
         ResultSet rsHashedPass = prepStmtGetHashedPass.executeQuery();
         String hashedPass = rsHashedPass.getString("password_hash");
