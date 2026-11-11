@@ -12,16 +12,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class AuthService {
-    //TODO: Remember that bcrypt truncates the input at 72 bytes, so implement a character limit on the password when registering users. This can be done on the GUI
 
-    //Checks if the sent username and password are correct
-    //Password is sent over https, it then gets hashed and compared to the hash in the database
-
-    //TODO: Remember that when implementing this function it must be run on its own thread due to SQL as well
-
-    //Gets the hashedPassword that corresponds to the username and checks if it matches the password parameter
-    //Also checks if the username exists in the database, if it does not, it returns false
-    //Returns true is password is correct, false if incorrect
+    /**
+     * Authenticates the user by checking if the username exists in the database and if the password mathches the
+     * hashed password stored in the database.
+     * @param username
+     * @param password
+     * @return true if the username exists and the password matches, false otherwise
+     * @throws SQLException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     public boolean authenticate(String username, String password) throws SQLException, ExecutionException, InterruptedException {
         //Check if the username exists in the database, if it does not, return false
         Connection usersConnection = DatabaseManager.connectUsersDb();

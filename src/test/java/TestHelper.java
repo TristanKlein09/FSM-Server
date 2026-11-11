@@ -67,6 +67,7 @@ public class TestHelper {
         String requestString = requestLine + "\r\n"
                 + "Host: localhost\r\n"
                 + "Content-Length: " + body.length() + "\r\n"
+                + "Content-Type: application/json" + "\r\n"
                 + "\r\n"
                 + body;
 

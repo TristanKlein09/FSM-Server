@@ -61,5 +61,19 @@ class RegistrationTest {
         assertEquals(0, TestHelper.countRows("userLogins"));
         assertEquals(0, TestHelper.countRows("users"));
     }
+
+    //Erroneous: a password longer than 72 characters is refused and nothing is saved
+    @Test
+    @DisplayName("Re3: Password longer than 72 characters returns 400 and saves nothing (erroneous)")
+    void passwordTooLong() throws Exception {
+        String body = "{\"username\":\"Robin\",\"password\":\"password123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\","
+                + "\"firstName\":\"Richard\",\"lastName\":\"Grayson\",\"permissions\":\"TECHNICIAN\"}";
+
+        HttpResponse response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.status);
+        assertEquals(0, TestHelper.countRows("userLogins"));
+        assertEquals(0, TestHelper.countRows("users"));
+    }
 }
 

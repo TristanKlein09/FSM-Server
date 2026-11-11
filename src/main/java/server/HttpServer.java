@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
 
+//TODO: HTTPS!!!!
 public class HttpServer {
     //Http Server must be a singleton
     private static HttpServer instance;
@@ -27,7 +28,11 @@ public class HttpServer {
 
     private HttpServer() {}
 
-    //Simply starts the server
+    /**
+     * Starts the server and listens for a connection. If a connection is established, it calls a function to handle the
+     * client connection.
+     * @throws IOException
+     */
     public void startServer() throws IOException {
         try {
             ServerSocket serverSocket = new ServerSocket(this.port);
@@ -39,13 +44,18 @@ public class HttpServer {
                 handleClient(clientSocket);
             }
 
-            //TODO: Add print statements to the exceptions
         } catch (Exception e) {
             HttpResponse response = Util.handleException(e, "HttpServer.startServer()");
         }
     }
 
     //Handles the client connection
+
+    /**
+     * Handles the client connection by reading the request, routing it to the appropriate function and then sending
+     * the response back to the client.
+     * @param clientSocket
+     */
     private void handleClient(Socket clientSocket) {
         try {
             //Read message from client
@@ -54,22 +64,19 @@ public class HttpServer {
 
             while (true) {
                 Router router = new Router(reader);
-                HttpRequest request = router.createRequestObj();
+                //HttpRequest request = router.createRequestObj();
+                HttpRequest request = new HttpRequest(reader);
                 HttpResponse response = router.routeRequest(request); //Create the response based on the request
                 System.out.println(response.statusLine);
 
                 //Flushing the streams
-                //TODO: Check if we need a thread here or not
-                new Thread(() -> {
-                    try {
-                        outputStream.write(response.responseBytes);
-                        outputStream.write(response.body);
-                        outputStream.flush();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                }).start();
+                try {
+                    outputStream.write(response.responseBytes);
+                    outputStream.write(response.body);
+                    outputStream.flush();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
 
                 //Check connection header to see if the connection should close
@@ -90,8 +97,21 @@ public class HttpServer {
 
     //----- HTTP RESPONSES -----
 
-    //TODO: This only works if the specified content type is json
+    /**
+     * Handles the entire login sequence including authenticating the user and sending the response back to the client.
+     * @param request
+     * @return {@link HttpResponse} with status code 202 if the login is successful or 401 if the login is unsuccessful
+     * @throws SQLException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     public HttpResponse userLogin(HttpRequest request) throws SQLException, ExecutionException, InterruptedException {
+        //We can only accept requests with application/json so if no return 400 Bad Request response
+        if (!(request.getContentType().equals("application/json"))) {
+            return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
+                    "Content-Type must be application/json".getBytes(StandardCharsets.UTF_8));
+        }
+
         HttpResponse response;
         AuthService authService = new AuthService();
         Gson gson = new Gson();
@@ -110,8 +130,23 @@ public class HttpServer {
         return response;
     }
 
-    //TODO: This only works if the specified content type is json
+    /**
+     * Handles the entire user registration sequence including hashing the password, creating the user in the database
+     * and sending the response back to the client.
+     * @param request
+     * @return {@link HttpResponse} with status code 201 if the user is successfully created or 400 if the request is invalid
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws SQLException
+     */
     public HttpResponse registerUser(HttpRequest request) throws ExecutionException, InterruptedException, SQLException {
+        //We can only accept requests with application/json so if no return 400 Bad Request response
+        if (!(request.getContentType().equals("application/json"))) {
+            System.out.println("Content type must be application/json");
+            return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
+                    "Content-Type must be application/json".getBytes(StandardCharsets.UTF_8));
+        }
+
         HttpResponse response;
 
         try {
@@ -121,23 +156,31 @@ public class HttpServer {
             String body = request.getBody();
             jsonRegisterUser userProperties = gson.fromJson(body, jsonRegisterUser.class);
 
-            //If any of the fields are null or empty, return a 400 Bad Request response
+            //Checking if username or password is null or empty, if so return a 400 Bad Request response
             if (userProperties.getUsername() == null || userProperties.getUsername().isEmpty()
                     || userProperties.getPassword() == null || userProperties.getPassword().isEmpty()
                     || userProperties.getFirstName() == null || userProperties.getFirstName().isEmpty()
                     || userProperties.getLastName() == null || userProperties.getLastName().isEmpty()
                     || userProperties.getPermissions() == null)
             {
-                response = new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
-            } else {
-                String passwordHash = Util.hashPlainText(userProperties.getPassword());
-
-                //Replace password with the password hash
-                User user = new User(userProperties.getUsername(), passwordHash, userProperties.getFirstName(), userProperties.getLastName(), userProperties.getPermissions());
-                user = authService.registerUser(user);
-
-                response = new HttpResponse(HttpStatus.CREATED, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+                return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
+                        "".getBytes(StandardCharsets.UTF_8));
             }
+
+            //Bcrypt truncates the input at 72 bytes, so the password must be less than 72 characters, otherwise return a 400 Bad Request response
+            if (userProperties.getPassword().length() > 72) {
+                return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
+                        "Password must be less than 72 characters".getBytes(StandardCharsets.UTF_8));
+            }
+
+            String passwordHash = Util.hashPlainText(userProperties.getPassword());
+
+            //Replace password with the password hash
+            User user = new User(userProperties.getUsername(), passwordHash, userProperties.getFirstName(), userProperties.getLastName(), userProperties.getPermissions());
+            user = authService.registerUser(user);
+
+            response = new HttpResponse(HttpStatus.CREATED, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+
         } catch (Exception e) {
             response = Util.handleException(e, "HttpServer.registerUser()");
         }
@@ -173,9 +216,6 @@ public class HttpServer {
         return new HttpResponse(HttpStatus.METHOD_NOT_ALLOWED, "text/plain", "keep-alive",
                 ("Method: " + request.getMethod() + " not allowed with target: " + request.getTarget()).getBytes(StandardCharsets.UTF_8));
     }
-
-
-
 
     //Getters and setters
     public static HttpServer getInstance() {
