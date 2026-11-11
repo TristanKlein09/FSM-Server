@@ -14,8 +14,8 @@ class RouterTest {
     void checkConnection() throws Exception {
         HttpResponse response = TestHelper.sendRequest("GET /models/checkConnection HTTP/1.1", "");
 
-        assertEquals(HttpStatus.OK, response.status);
-        assertEquals(0, response.body.length);
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals(0, response.getBody().length);
     }
 
     //Invalid: login only accepts POST, so GET should be refused
@@ -24,7 +24,7 @@ class RouterTest {
     void incorrectMethodLogin() throws Exception {
         HttpResponse response = TestHelper.sendRequest("GET /models/login HTTP/1.1", "");
 
-        assertEquals(HttpStatus.METHOD_NOT_ALLOWED, response.status);
+        assertEquals(HttpStatus.METHOD_NOT_ALLOWED, response.getStatus());
     }
 
     //Erroneous: an unknown target gets a 404 and an error message
@@ -33,8 +33,8 @@ class RouterTest {
     void unknownTarget() throws Exception {
         HttpResponse response = TestHelper.sendRequest("GET /doesntExist HTTP/1.1", "");
 
-        String body = new String(response.body, StandardCharsets.UTF_8);
-        assertEquals(HttpStatus.NOT_FOUND, response.status);
+        String body = new String(response.getBody(), StandardCharsets.UTF_8);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatus());
         assertEquals("Target: /doesntExist not found", body);
     }
 }

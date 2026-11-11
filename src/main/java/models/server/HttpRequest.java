@@ -24,7 +24,6 @@ public class HttpRequest {
     private String contentType; //Format of the request body
     private String contentLength; //Length of the request body
     private String connection; //Connection type (keep-alive, close, etc.)
-    private String authorization; //Authorization header (if present) - TODO: Figure out if needed
 
     //Body
     private String body;
@@ -91,9 +90,6 @@ public class HttpRequest {
             case "connection":
                 this.connection = line.substring(line.indexOf(":") + 1).trim();
                 break;
-            case "authorization":
-                this.authorization = line.substring(line.indexOf(":") + 1).trim();
-                break;
             default:
                 System.out.println("Unknown header: " + line); //TODO: Log unknown headers
                 break;
@@ -119,7 +115,6 @@ public class HttpRequest {
     //Fully parses the body and sets its contents to the corresponding attribute
     private void parseBody() throws IOException {
         try {
-            //TODO: Check if we need length, it could be replaced by just this.contentLength
             int length = Integer.parseInt(this.contentLength); //Gets the content length from the header
             char[] bodyChars = new char[length]; //Creates a char array with length as specified by content length header
             reader.read(bodyChars, 0, length);
@@ -226,14 +221,6 @@ public class HttpRequest {
 
     public void setConnection(String connection) {
         this.connection = connection;
-    }
-
-    public String getAuthorization() {
-        return authorization;
-    }
-
-    public void setAuthorization(String authorization) {
-        this.authorization = authorization;
     }
 
     public String getBody() {

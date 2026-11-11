@@ -16,12 +16,12 @@ public class AuthService {
     /**
      * Authenticates the user by checking if the username exists in the database and if the password mathches the
      * hashed password stored in the database.
-     * @param username
-     * @param password
+     * @param username username to authenticate
+     * @param password password to authenticate
      * @return true if the username exists and the password matches, false otherwise
-     * @throws SQLException
-     * @throws ExecutionException
-     * @throws InterruptedException
+     * @throws SQLException Required for database connection and query execution
+     * @throws ExecutionException Required for CompletableFuture.get()
+     * @throws InterruptedException Required for CompletableFuture.get()
      */
     public boolean authenticate(String username, String password) throws SQLException, ExecutionException, InterruptedException {
         //Check if the username exists in the database, if it does not, return false
@@ -52,8 +52,7 @@ public class AuthService {
 
         //BCrypt.checkpw is intensive enough to have to spin up a new thread
         CompletableFuture<Boolean> future = CompletableFuture.supplyAsync(() -> { //CompletableFuture sing
-            Boolean valid = BCrypt.checkpw(password, hashedPass);
-            return valid;
+            return BCrypt.checkpw(password, hashedPass);
         });
 
         Boolean valid = future.get();
@@ -63,7 +62,7 @@ public class AuthService {
     }
 
     //Registering user, adds to the database to generate the ID, then returns User with a new id, or null if unsuccessful
-    public User registerUser(User user) throws SQLException {
+    public User registerUser(User user) {
         //Check if user already has id, in which case it is already in the database
         if (user.getId() != 0) return null; //0 is the default value for int, so if it is not 0, the user already exists
         try {

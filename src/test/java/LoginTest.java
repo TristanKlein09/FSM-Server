@@ -23,8 +23,8 @@ class LoginTest {
 
         HttpResponse response = TestHelper.sendRequest("POST /models/login HTTP/1.1", body);
 
-        assertEquals(HttpStatus.ACCEPTED, response.status);
-        assertEquals(0, response.body.length);
+        assertEquals(HttpStatus.ACCEPTED, response.getStatus());
+        assertEquals(0, response.getBody().length);
     }
 
     //Erroneous: right username and wrong password is not accepted
@@ -35,8 +35,8 @@ class LoginTest {
 
         HttpResponse response = TestHelper.sendRequest("POST /models/login HTTP/1.1", body);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.status);
-        assertEquals(0, response.body.length);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatus());
+        assertEquals(0, response.getBody().length);
     }
 
     //Erroneous: wrong username (no account exists) is no accepted
@@ -47,8 +47,8 @@ class LoginTest {
 
         HttpResponse response = TestHelper.sendRequest("POST /models/login HTTP/1.1", body);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.status);
-        assertEquals(0, response.body.length);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatus());
+        assertEquals(0, response.getBody().length);
     }
 }
 

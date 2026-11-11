@@ -2,7 +2,6 @@ package database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class DatabaseManager {
     //TODO: Add some functions to create the tables, so that when a new person sets up the server for the first time they can just call the functions
@@ -12,7 +11,7 @@ public class DatabaseManager {
     public static void setUsersDbUrl(String url) { usersDbUrl = url; }
 
     //Opens a connection to the users.sqlite database
-    public static Connection connectUsersDb() throws SQLException {
+    public static Connection connectUsersDb() {
         try {
             return DriverManager.getConnection(DatabaseManager.usersDbUrl); //Establish connection to the database
 
@@ -22,10 +21,4 @@ public class DatabaseManager {
 
         return null;
     }
-
-    //Getters and setters
-    public static String getUsersDbUrl() {
-        return usersDbUrl;
-    }
-
 }

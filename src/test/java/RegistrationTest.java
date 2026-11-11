@@ -24,7 +24,7 @@ class RegistrationTest {
 
         HttpResponse response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
 
-        assertEquals(HttpStatus.CREATED, response.status);
+        assertEquals(HttpStatus.CREATED, response.getStatus());
         //Checking that every entry in the tables are correct
         assertEquals("Robin", TestHelper.getValue("SELECT username FROM userLogins"));
         assertEquals("Richard", TestHelper.getValue("SELECT first_name FROM users"));
@@ -43,7 +43,7 @@ class RegistrationTest {
 
         HttpResponse response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.status);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(0, TestHelper.countRows("userLogins"));
         assertEquals(0, TestHelper.countRows("users"));
     }
@@ -57,7 +57,7 @@ class RegistrationTest {
 
         HttpResponse response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.status);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(0, TestHelper.countRows("userLogins"));
         assertEquals(0, TestHelper.countRows("users"));
     }
@@ -71,7 +71,7 @@ class RegistrationTest {
 
         HttpResponse response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.status);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(0, TestHelper.countRows("userLogins"));
         assertEquals(0, TestHelper.countRows("users"));
     }

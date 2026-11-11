@@ -67,12 +67,12 @@ public class HttpServer {
                 //HttpRequest request = router.createRequestObj();
                 HttpRequest request = new HttpRequest(reader);
                 HttpResponse response = router.routeRequest(request); //Create the response based on the request
-                System.out.println(response.statusLine);
+                System.out.println(response.getStatusLine());
 
                 //Flushing the streams
                 try {
-                    outputStream.write(response.responseBytes);
-                    outputStream.write(response.body);
+                    outputStream.write(response.getResponseBytes());
+                    outputStream.write(response.getBody());
                     outputStream.flush();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
