@@ -24,6 +24,7 @@ public class HttpRequest {
     private String contentType; //Format of the request body
     private String contentLength; //Length of the request body
     private String connection; //Connection type (keep-alive, close, etc.)
+    private String acceptEncoding; //Type of file the client can accept
 
     //Body
     private String body;
@@ -61,9 +62,6 @@ public class HttpRequest {
             this.target = requestLineArray[1];
             this.httpVersion = requestLineArray[2];
 
-            //System.out.println("Method: " + method);
-            //System.out.println("Target: " + target);
-            //System.out.println("HTTP Version: " + httpVersion);
         } catch (Exception e) {
             System.out.println("Error parsing request line: " + e.getMessage());
         }
@@ -89,6 +87,9 @@ public class HttpRequest {
                 break;
             case "connection":
                 this.connection = line.substring(line.indexOf(":") + 1).trim();
+                break;
+            case "accept-encoding":
+                this.acceptEncoding = line.substring(line.indexOf(":") + 1).trim();
                 break;
             default:
                 System.out.println("Unknown header: " + line); //TODO: Log unknown headers

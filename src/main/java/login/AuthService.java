@@ -1,6 +1,7 @@
 package login;
 
-import database.DatabaseManager;
+import database.DatabaseService;
+import database.implementations.SQLDatabaseConnectionProvider;
 import models.login.User;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -25,7 +26,9 @@ public class AuthService {
      */
     public boolean authenticate(String username, String password) throws SQLException, ExecutionException, InterruptedException {
         //Check if the username exists in the database, if it does not, return false
-        Connection usersConnection = DatabaseManager.connectUsersDb();
+        SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
+        Connection usersConnection = connectionProvider.connectUsersDb();
+        //Connection usersConnection = DatabaseService.connectUsersDb();
         //Works by runnning a select query and checks how many rows are returned, if it is 0, the username does not exist
         String checkUsernameExists = "SELECT 1 FROM userLogins WHERE username = (?) LIMIT 1"; //Only return one row
         assert usersConnection != null; //usersConnection cannot be null
@@ -41,7 +44,7 @@ public class AuthService {
 
 
         //Get the hashed password from the database that corresponds to the username
-        Connection usersConnection2 = DatabaseManager.connectUsersDb();
+        Connection usersConnection2 = connectionProvider.connectUsersDb();
         String getHashedPass = "SELECT password_hash FROM userLogins WHERE username = (?)";
         assert usersConnection2 != null; //usersConnection cannot be null
         PreparedStatement prepStmtGetHashedPass = usersConnection2.prepareStatement(getHashedPass);
@@ -66,7 +69,8 @@ public class AuthService {
         //Check if user already has id, in which case it is already in the database
         if (user.getId() != 0) return null; //0 is the default value for int, so if it is not 0, the user already exists
         try {
-            Connection usersConnection = DatabaseManager.connectUsersDb();
+            SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
+            Connection usersConnection = connectionProvider.connectUsersDb();
 
             //Inserting into userLogins table
             //Question marks are placeholders for prepared statement to prevent SQL injection

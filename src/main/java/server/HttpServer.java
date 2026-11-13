@@ -66,6 +66,9 @@ public class HttpServer {
                 Router router = new Router(reader);
                 //HttpRequest request = router.createRequestObj();
                 HttpRequest request = new HttpRequest(reader);
+                System.out.println(request.getRequestLine());
+                System.out.println(request.getContentType());
+                System.out.println(request.getBody());
                 HttpResponse response = router.routeRequest(request); //Create the response based on the request
                 System.out.println(response.getStatusLine());
 
@@ -107,7 +110,7 @@ public class HttpServer {
      */
     public HttpResponse userLogin(HttpRequest request) throws SQLException, ExecutionException, InterruptedException {
         //We can only accept requests with application/json so if no return 400 Bad Request response
-        if (!(request.getContentType().equals("application/json"))) {
+        if (!(request.getContentType().contains("application/json"))) {
             return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
                     "Content-Type must be application/json".getBytes(StandardCharsets.UTF_8));
         }
@@ -141,7 +144,7 @@ public class HttpServer {
      */
     public HttpResponse registerUser(HttpRequest request) throws ExecutionException, InterruptedException, SQLException {
         //We can only accept requests with application/json so if no return 400 Bad Request response
-        if (!(request.getContentType().equals("application/json"))) {
+        if (!(request.getContentType().contains("application/json"))) {
             System.out.println("Content type must be application/json");
             return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
                     "Content-Type must be application/json".getBytes(StandardCharsets.UTF_8));

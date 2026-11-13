@@ -1,4 +1,4 @@
-import database.DatabaseManager;
+import database.DatabaseService;
 import models.server.HttpRequest;
 import models.server.HttpResponse;
 import org.mindrot.jbcrypt.BCrypt;
@@ -22,7 +22,7 @@ public class TestHelper {
 
     //Between each test the database should be reset, so that the tests don't interfere with each other
     public static void resetDatabase() throws Exception {
-        DatabaseManager.setUsersDbUrl(TEST_DB_URL);
+        DatabaseService.setUsersDbUrl(TEST_DB_URL);
 
         try {
             Connection connection = DriverManager.getConnection(TEST_DB_URL); //Establish connection to the database
