@@ -1,4 +1,5 @@
 import database.DatabaseService;
+import database.implementations.SQLDatabaseConnectionProvider;
 import models.server.HttpRequest;
 import models.server.HttpResponse;
 import org.mindrot.jbcrypt.BCrypt;
@@ -22,11 +23,14 @@ public class TestHelper {
 
     //Between each test the database should be reset, so that the tests don't interfere with each other
     public static void resetDatabase() throws Exception {
-        DatabaseService.setUsersDbUrl(TEST_DB_URL);
+        SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
 
         try {
-            Connection connection = DriverManager.getConnection(TEST_DB_URL); //Establish connection to the database
+            //Establish connection to the database
+            Connection connection = connectionProvider.connectToDb(TEST_DB_URL);
+            connectionProvider.setUsersDbUrl(TEST_DB_URL);
             Statement statement = connection.createStatement();
+
 
             //Deleting the tables if they exist
             statement.execute("DROP TABLE IF EXISTS userLogins");
@@ -43,10 +47,12 @@ public class TestHelper {
 
     //Adds a user to the temporary database. Also hashed the password, as this is what the real server does
     public static void addUser(String username, String password) throws Exception {
+        SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
+        connectionProvider.setUsersDbUrl(TEST_DB_URL);
         String hash = BCrypt.hashpw(password, BCrypt.gensalt()); //Hashing the password
 
         try {
-            Connection connection = DriverManager.getConnection(TEST_DB_URL);
+            Connection connection = connectionProvider.connectToDb(TEST_DB_URL);
             //SQL statement to insert the user into the logins table
             PreparedStatement statement =
                     connection.prepareStatement("INSERT INTO userLogins (username, password_hash) VALUES (?, ?)");
@@ -84,7 +90,9 @@ public class TestHelper {
 
     // Runs a SELECT on the test database and returns the first column of the first row
     public static String getValue(String sql) throws Exception {
-        try (Connection connection = DriverManager.getConnection(TEST_DB_URL);
+        SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
+        connectionProvider.setUsersDbUrl(TEST_DB_URL);
+        try (Connection connection = connectionProvider.connectToDb(TEST_DB_URL);
              Statement statement = connection.createStatement();
              ResultSet results = statement.executeQuery(sql)) {
             results.next();
