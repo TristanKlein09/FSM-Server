@@ -8,11 +8,6 @@ public class User {
     private String lastName;
     private Permissions permission;
 
-    //Constructor with id
-    public User() {
-
-    }
-
     //Constructor without id, for registering a new user
     public User(String username, String passwordHash, String firstName, String lastName, Permissions permission) {
         this.username = username;

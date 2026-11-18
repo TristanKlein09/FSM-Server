@@ -14,7 +14,7 @@ import java.util.concurrent.ExecutionException;
 public class AuthService {
 
     /**
-     * Authenticates the user by checking if the username exists in the database and if the password mathches the
+     * Authenticates the user by checking if the username exists in the database and if the password matches the
      * hashed password stored in the database.
      * @param username username to authenticate
      * @param password password to authenticate
@@ -27,7 +27,7 @@ public class AuthService {
         //Check if the username exists in the database, if it does not, return false
         SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
         Connection usersConnection = connectionProvider.connectToDb(SQLDatabaseConnectionProvider.usersDbUrl);
-        //Works by runnning a select query and checks how many rows are returned, if it is 0, the username does not exist
+        //Works by running a select query and checks how many rows are returned, if it is 0, the username does not exist
         String checkUsernameExists = "SELECT 1 FROM userLogins WHERE username = (?) LIMIT 1"; //Only return one row
         assert usersConnection != null; //usersConnection cannot be null
         PreparedStatement prepStmtCheckUsername = usersConnection.prepareStatement(checkUsernameExists);

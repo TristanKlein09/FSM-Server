@@ -6,7 +6,7 @@ public enum Permissions {
     MANAGER("Manager"),
     TECHNICIAN("Technician");
 
-    private String description;
+    private final String description;
 
     Permissions(String description) {
         this.description = description;

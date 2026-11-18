@@ -40,7 +40,6 @@ public class Response {
 
         //Status Line
         private String statusLine;
-        private String httpVersion = "HTTP/1.1";
         private HttpStatus status;
 
         //Headers
@@ -86,6 +85,8 @@ public class Response {
                 this.body = "".getBytes(StandardCharsets.UTF_8);
             }
 
+            this.contentLength = Util.contentLength(body);
+
             createStatusLine();
             createResponse();
 
@@ -103,6 +104,7 @@ public class Response {
         }
 
         private void createStatusLine() {
+            String httpVersion = "HTTP/1.1";
             this.statusLine = httpVersion + " " + status.getCode() + " " + status.getReasonPhrase() + CRLF;
             //System.out.println(this.statusLine);
         }
