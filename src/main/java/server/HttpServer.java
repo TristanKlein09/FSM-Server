@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 public class HttpServer {
     //Http Server must be a singleton
     private static HttpServer instance;
-    private final int port = 9999; //Specifies the port to listen on
+    private final int port = 9998; //Specifies the port to listen on
 
     private HttpServer() {}
 
