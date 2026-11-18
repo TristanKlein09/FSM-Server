@@ -22,13 +22,37 @@ public class TestHelper {
     private static final String TEST_DB_URL = "jdbc:sqlite:test_users.sqlite";
 
     //Between each test the database should be reset, so that the tests don't interfere with each other
-    public static void resetDatabase() throws Exception {
+    public static void resetTestDatabase() throws Exception {
         SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
 
         try {
             //Establish connection to the database
             Connection connection = connectionProvider.connectToDb(TEST_DB_URL);
             connectionProvider.setUsersDbUrl(TEST_DB_URL);
+            Statement statement = connection.createStatement();
+
+
+            //Deleting the tables if they exist
+            statement.execute("DROP TABLE IF EXISTS userLogins");
+            statement.execute("DROP TABLE IF EXISTS users");
+
+            //Creating new empty tables
+            statement.execute("CREATE TABLE userLogins (user_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT NOT NULL, password_hash TEXT NOT NULL)");
+            statement.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, permission TEXT)");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error resetting test database: " + e.getMessage());
+        }
+    }
+
+    //Between each test the database should be reset, so that the tests don't interfere with each other
+    public static void resetDatabase(String url) throws Exception {
+        SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
+
+        try {
+            //Establish connection to the database
+            Connection connection = connectionProvider.connectToDb(url);
+            connectionProvider.setUsersDbUrl(url);
             Statement statement = connection.createStatement();
 
 
@@ -93,6 +117,18 @@ public class TestHelper {
         SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
         connectionProvider.setUsersDbUrl(TEST_DB_URL);
         try (Connection connection = connectionProvider.connectToDb(TEST_DB_URL);
+             Statement statement = connection.createStatement();
+             ResultSet results = statement.executeQuery(sql)) {
+            results.next();
+            return results.getString(1);
+        }
+    }
+
+    // Runs a SELECT on the test database and returns the first column of the first row
+    public static String getValueFromDb(String url,String sql) throws Exception {
+        SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
+        connectionProvider.setUsersDbUrl(url);
+        try (Connection connection = connectionProvider.connectToDb(url);
              Statement statement = connection.createStatement();
              ResultSet results = statement.executeQuery(sql)) {
             results.next();

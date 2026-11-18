@@ -12,7 +12,7 @@ class RegistrationTest {
     //Runs before every test and resets the database so that the tables are empty
     @BeforeEach
     void setUp() throws Exception {
-        TestHelper.resetDatabase();
+        TestHelper.resetTestDatabase();
     }
 
     //Valid: a new user is saved correctly and the password is stored as a hash

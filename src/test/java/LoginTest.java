@@ -11,7 +11,7 @@ class LoginTest {
     //Runs before every test to add empty tables and one user: BatMan with password "password" to log in as
     @BeforeEach
     void setUp() throws Exception {
-        TestHelper.resetDatabase();
+        TestHelper.resetTestDatabase();
         TestHelper.addUser("BatMan", "password");
     }
 

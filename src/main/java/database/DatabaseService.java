@@ -11,13 +11,13 @@ import java.sql.ResultSet;
 
 @Deprecated
 public class DatabaseService {
-    //TODO: Add some functions to create the tables, so that when a new person sets up the server for the first time they can just call the functions
 
     private static String usersDbUrl = "jdbc:sqlite:users.sqlite";
 
     public static void setUsersDbUrl(String url) { usersDbUrl = url; }
 
     //Opens a connection to the users.sqlite database
+    @Deprecated
     public static Connection connectUsersDb() {
         try {
             return DriverManager.getConnection(DatabaseService.usersDbUrl); //Establish connection to the database
@@ -29,12 +29,12 @@ public class DatabaseService {
         return null;
     }
 
-    //TODO: Finish
-    //TODO: Write tests for this function
+
     /**
      * Initialises the database with the required tables if they do not exist. Also adds a default admin user
      * if the tables are empty. There is hashing involved so this needs to be run on its own thread.
      */
+    @Deprecated
     public void initTables() {
         try (Connection connection = connectUsersDb();){
             //Create usersLogins table if it does not exist
