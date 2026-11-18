@@ -1,8 +1,9 @@
-package models.server;
+package models.network;
 
 import util.Util;
 import java.nio.charset.StandardCharsets;
 
+@Deprecated
 public class HttpResponse {
     private final String CRLF = "\r\n";
     private String response;

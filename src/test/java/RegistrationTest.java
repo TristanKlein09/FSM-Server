@@ -1,5 +1,6 @@
-import models.server.HttpResponse;
-import models.server.HttpStatus;
+import models.network.HttpResponse;
+import models.network.HttpStatus;
+import models.network.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ class RegistrationTest {
         String body = "{\"username\":\"Robin\",\"password\":\"password123\","
                 + "\"firstName\":\"Richard\",\"lastName\":\"Grayson\",\"permissions\":\"TECHNICIAN\"}";
 
-        HttpResponse response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
+        Response response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
 
         assertEquals(HttpStatus.CREATED, response.getStatus());
         //Checking that every entry in the tables are correct
@@ -41,7 +42,7 @@ class RegistrationTest {
         String body = "{\"password\":\"password123\","
                 + "\"firstName\":\"Richard\",\"lastName\":\"Grayson\",\"permissions\":\"TECHNICIAN\"}";
 
-        HttpResponse response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
+        Response response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(0, TestHelper.countRows("userLogins"));
@@ -55,7 +56,7 @@ class RegistrationTest {
         String body = "{\"username\":\"Robin\"," +
                 "\"firstName\":\"Richard\",\"lastName\":\"Grayson\",\"permissions\":\"TECHNICIAN\"}";
 
-        HttpResponse response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
+        Response response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(0, TestHelper.countRows("userLogins"));
@@ -69,7 +70,7 @@ class RegistrationTest {
         String body = "{\"username\":\"Robin\",\"password\":\"password123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\","
                 + "\"firstName\":\"Richard\",\"lastName\":\"Grayson\",\"permissions\":\"TECHNICIAN\"}";
 
-        HttpResponse response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
+        Response response = TestHelper.sendRequest("POST /models/registerUser HTTP/1.1", body);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(0, TestHelper.countRows("userLogins"));

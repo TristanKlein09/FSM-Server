@@ -1,5 +1,5 @@
-import models.server.HttpResponse;
-import models.server.HttpStatus;
+import models.network.HttpStatus;
+import models.network.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,7 @@ class RouterTest {
     @Test
     @DisplayName("Ro1: checkConnection returns 200 and empty body (valid)")
     void checkConnection() throws Exception {
-        HttpResponse response = TestHelper.sendRequest("GET /models/checkConnection HTTP/1.1", "");
+        Response response = TestHelper.sendRequest("GET /models/checkConnection HTTP/1.1", "");
 
         assertEquals(HttpStatus.OK, response.getStatus());
         assertEquals(0, response.getBody().length);
@@ -22,7 +22,7 @@ class RouterTest {
     @Test
     @DisplayName("Ro2: GET /login returns 405 (invalid)")
     void incorrectMethodLogin() throws Exception {
-        HttpResponse response = TestHelper.sendRequest("GET /models/login HTTP/1.1", "");
+        Response response = TestHelper.sendRequest("GET /models/login HTTP/1.1", "");
 
         assertEquals(HttpStatus.METHOD_NOT_ALLOWED, response.getStatus());
     }
@@ -31,7 +31,7 @@ class RouterTest {
     @Test
     @DisplayName("Ro3: unknown target returns 404 with message")
     void unknownTarget() throws Exception {
-        HttpResponse response = TestHelper.sendRequest("GET /doesntExist HTTP/1.1", "");
+        Response response = TestHelper.sendRequest("GET /doesntExist HTTP/1.1", "");
 
         String body = new String(response.getBody(), StandardCharsets.UTF_8);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatus());

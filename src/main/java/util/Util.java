@@ -1,7 +1,8 @@
 package util;
 
-import models.server.HttpResponse;
-import models.server.HttpStatus;
+import models.network.HttpResponse;
+import models.network.HttpStatus;
+import models.network.response.Response;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.nio.charset.StandardCharsets;
@@ -36,8 +37,14 @@ public class Util {
     }
 
     //Handles any incoming exceptions by returning the HttpResponse that should be sent to the client
-    public static HttpResponse handleException(Exception e, String methodName) {
-        HttpResponse httpResponse = new HttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, "text/plain", "keep-alive", (e.toString() + " in method: " + methodName).getBytes(StandardCharsets.UTF_8));
+    public static Response handleException(Exception e, String methodName) {
+        //Response httpResponse = new HttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, "text/plain", "keep-alive", (e.toString() + " in method: " + methodName).getBytes(StandardCharsets.UTF_8));
+        Response httpResponse = new Response.Builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType("text/plain")
+                .connection("keep-alive")
+                .body((e.toString() + " in method: " + methodName).getBytes(StandardCharsets.UTF_8))
+                .build();
         System.out.println("Error in: " + methodName + ": " + e.getMessage());
         return httpResponse;
     }

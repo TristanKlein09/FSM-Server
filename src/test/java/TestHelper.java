@@ -1,14 +1,13 @@
-import database.DatabaseService;
 import database.implementations.SQLDatabaseConnectionProvider;
-import models.server.HttpRequest;
-import models.server.HttpResponse;
+import models.network.HttpRequest;
+import models.network.HttpResponse;
+import models.network.response.Response;
 import org.mindrot.jbcrypt.BCrypt;
 import server.Router;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -93,7 +92,7 @@ public class TestHelper {
 
     //Creates a request and passes it onto the router and returns the response.
     //This is done to be able to test the server without needing a network.
-    public static HttpResponse sendRequest(String requestLine, String body) throws Exception {
+    public static Response sendRequest(String requestLine, String body) throws Exception {
         String requestString = requestLine + "\r\n"
                 + "Host: localhost\r\n"
                 + "Content-Length: " + body.length() + "\r\n"

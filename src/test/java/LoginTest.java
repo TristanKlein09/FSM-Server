@@ -1,5 +1,6 @@
-import models.server.HttpResponse;
-import models.server.HttpStatus;
+import models.network.HttpResponse;
+import models.network.HttpStatus;
+import models.network.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class LoginTest {
     void correctCredentials() throws Exception {
         String body = "{\"username\":\"BatMan\",\"password\":\"password\"}";
 
-        HttpResponse response = TestHelper.sendRequest("POST /models/login HTTP/1.1", body);
+        Response response = TestHelper.sendRequest("POST /models/login HTTP/1.1", body);
 
         assertEquals(HttpStatus.ACCEPTED, response.getStatus());
         assertEquals(0, response.getBody().length);
@@ -33,7 +34,7 @@ class LoginTest {
     void wrongPassword() throws Exception {
         String body = "{\"username\":\"BatMan\",\"password\":\"password123\"}";
 
-        HttpResponse response = TestHelper.sendRequest("POST /models/login HTTP/1.1", body);
+        Response response = TestHelper.sendRequest("POST /models/login HTTP/1.1", body);
 
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatus());
         assertEquals(0, response.getBody().length);
@@ -45,7 +46,7 @@ class LoginTest {
     void unknownUsername() throws Exception {
         String body = "{\"username\":\"Joker\",\"password\":\"password123\"}";
 
-        HttpResponse response = TestHelper.sendRequest("POST /models/login HTTP/1.1", body);
+        Response response = TestHelper.sendRequest("POST /models/login HTTP/1.1", body);
 
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatus());
         assertEquals(0, response.getBody().length);

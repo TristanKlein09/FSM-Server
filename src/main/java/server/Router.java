@@ -1,7 +1,7 @@
 package server;
 
-import models.server.HttpRequest;
-import models.server.HttpResponse;
+import models.network.HttpRequest;
+import models.network.response.Response;
 
 import java.io.BufferedReader;
 import java.sql.SQLException;
@@ -18,15 +18,15 @@ public class Router {
      * Routes the request to the appropriate function based on the target of the request. It also checks if the method
      * is appropriate for the target, if not it returns a 405 Method Not Allowed response.
      * @param request
-     * @return {@link HttpResponse} object containing the response to the request
+     * @return {@link Response} object containing the response to the request
      * @throws SQLException
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public HttpResponse routeRequest(HttpRequest request) throws SQLException, ExecutionException, InterruptedException {
+    public Response routeRequest(HttpRequest request) throws SQLException, ExecutionException, InterruptedException {
         HttpServer server = HttpServer.getInstance();
         String target = request.getTarget();
-        HttpResponse response = null;
+        Response response = null;
 
         switch (target) {
             case "/models/login":

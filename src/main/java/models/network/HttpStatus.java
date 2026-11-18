@@ -1,4 +1,4 @@
-package models.server;
+package models.network;
 
 public enum HttpStatus {
     CONTINUE(100, "Continue"),

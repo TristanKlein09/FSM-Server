@@ -5,9 +5,10 @@ import models.json.jsonLogin;
 import models.json.jsonRegisterUser;
 import login.AuthService;
 import models.login.User;
-import models.server.HttpRequest;
-import models.server.HttpResponse;
-import models.server.HttpStatus;
+import models.network.HttpRequest;
+import models.network.HttpResponse;
+import models.network.HttpStatus;
+import models.network.response.Response;
 import util.Util;
 
 import java.io.BufferedReader;
@@ -45,7 +46,7 @@ public class HttpServer {
             }
 
         } catch (Exception e) {
-            HttpResponse response = Util.handleException(e, "HttpServer.startServer()");
+            Response response = Util.handleException(e, "HttpServer.startServer()");
         }
     }
 
@@ -69,7 +70,7 @@ public class HttpServer {
                 System.out.println(request.getRequestLine());
                 System.out.println(request.getContentType());
                 System.out.println(request.getBody());
-                HttpResponse response = router.routeRequest(request); //Create the response based on the request
+                Response response = router.routeRequest(request); //Create the response based on the request
                 System.out.println(response.getStatusLine());
 
                 //Flushing the streams
@@ -108,14 +109,18 @@ public class HttpServer {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public HttpResponse userLogin(HttpRequest request) throws SQLException, ExecutionException, InterruptedException {
+    public Response userLogin(HttpRequest request) throws SQLException, ExecutionException, InterruptedException {
         //We can only accept requests with application/json so if no return 400 Bad Request response
         if (!(request.getContentType().contains("application/json"))) {
-            return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
-                    "Content-Type must be application/json".getBytes(StandardCharsets.UTF_8));
+//            return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
+//                    "Content-Type must be application/json".getBytes(StandardCharsets.UTF_8));
+            return new Response.Builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Content-Type must be application/json".getBytes(StandardCharsets.UTF_8))
+                    .build();
         }
 
-        HttpResponse response;
+        Response response;
         AuthService authService = new AuthService();
         Gson gson = new Gson();
 
@@ -125,9 +130,13 @@ public class HttpServer {
 
         //Login failed
         if (!valid) {
-            response = new HttpResponse(HttpStatus.UNAUTHORIZED, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+            //response = new HttpResponse(HttpStatus.UNAUTHORIZED, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+            response = new Response.Builder()
+                    .status(HttpStatus.UNAUTHORIZED).build();
         } else {
-            response = new HttpResponse(HttpStatus.ACCEPTED, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+            //response = new HttpResponse(HttpStatus.ACCEPTED, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+            response = new Response.Builder()
+                    .status(HttpStatus.ACCEPTED).build();
         }
 
         return response;
@@ -137,20 +146,23 @@ public class HttpServer {
      * Handles the entire user registration sequence including hashing the password, creating the user in the database
      * and sending the response back to the client.
      * @param request
-     * @return {@link HttpResponse} with status code 201 if the user is successfully created or 400 if the request is invalid
+     * @return {@link Response} with status code 201 if the user is successfully created or 400 if the request is invalid
      * @throws ExecutionException
      * @throws InterruptedException
      * @throws SQLException
      */
-    public HttpResponse registerUser(HttpRequest request) throws ExecutionException, InterruptedException, SQLException {
+    public Response registerUser(HttpRequest request) throws ExecutionException, InterruptedException, SQLException {
         //We can only accept requests with application/json so if no return 400 Bad Request response
         if (!(request.getContentType().contains("application/json"))) {
             System.out.println("Content type must be application/json");
-            return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
-                    "Content-Type must be application/json".getBytes(StandardCharsets.UTF_8));
+//            return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
+//                    "Content-Type must be application/json".getBytes(StandardCharsets.UTF_8));
+            return new Response.Builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Content-Type must be application/json".getBytes(StandardCharsets.UTF_8)).build();
         }
 
-        HttpResponse response;
+        Response response;
 
         try {
             AuthService authService = new AuthService();
@@ -166,14 +178,19 @@ public class HttpServer {
                     || userProperties.getLastName() == null || userProperties.getLastName().isEmpty()
                     || userProperties.getPermissions() == null)
             {
-                return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
-                        "".getBytes(StandardCharsets.UTF_8));
+//                return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
+//                        "".getBytes(StandardCharsets.UTF_8));
+                return new Response.Builder()
+                        .status(HttpStatus.BAD_REQUEST).build();
             }
 
             //Bcrypt truncates the input at 72 bytes, so the password must be less than 72 characters, otherwise return a 400 Bad Request response
             if (userProperties.getPassword().length() > 72) {
-                return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
-                        "Password must be less than 72 characters".getBytes(StandardCharsets.UTF_8));
+//                return new HttpResponse(HttpStatus.BAD_REQUEST, "text/plain", "keep-alive",
+//                        "Password must be less than 72 characters".getBytes(StandardCharsets.UTF_8));
+                return new Response.Builder()
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body("Password must be less than 72 characters".getBytes(StandardCharsets.UTF_8)).build();
             }
 
             String passwordHash = Util.hashPlainText(userProperties.getPassword());
@@ -182,7 +199,9 @@ public class HttpServer {
             User user = new User(userProperties.getUsername(), passwordHash, userProperties.getFirstName(), userProperties.getLastName(), userProperties.getPermissions());
             user = authService.registerUser(user);
 
-            response = new HttpResponse(HttpStatus.CREATED, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+//            response = new HttpResponse(HttpStatus.CREATED, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+            response = new Response.Builder()
+                    .status(HttpStatus.CREATED).build();
 
         } catch (Exception e) {
             response = Util.handleException(e, "HttpServer.registerUser()");
@@ -193,31 +212,40 @@ public class HttpServer {
 
     /**
      * The response that is sent when the client wants to check if they can successfully establish a connection with the client.
-     * @return {@link HttpResponse} with status code 200 and an empty body.
+     * @return {@link Response} with status code 200 and an empty body.
      */
-    public HttpResponse checkConnectionResponse() {
-        HttpResponse response;
-        response = new HttpResponse(HttpStatus.OK, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
-        return response;
+    public Response checkConnectionResponse() {
+//        HttpResponse response;
+//        response = new HttpResponse(HttpStatus.OK, "text/plain", "keep-alive", "".getBytes(StandardCharsets.UTF_8));
+//        return response;
+        return new Response.Builder()
+                .status(HttpStatus.OK).build();
     }
 
     /**
      *
      * @param target The target the user is trying to access.
-     * @return {@link HttpResponse} with status code 404 and body "Target: ... not found"
+     * @return {@link Response} with status code 404 and body "Target: ... not found"
      */
-    public HttpResponse unrecognisedTarget(String target) {
-        return new HttpResponse(HttpStatus.NOT_FOUND, "text/plain", "keep-alive", ("Target: " + target + " not found").getBytes(StandardCharsets.UTF_8));
+    public Response unrecognisedTarget(String target) {
+//        return new HttpResponse(HttpStatus.NOT_FOUND, "text/plain", "keep-alive", ("Target: " + target + " not found").getBytes(StandardCharsets.UTF_8));
+        return new Response.Builder()
+                .status(HttpStatus.NOT_FOUND)
+                .body(("Target: " + target + " not found").getBytes(StandardCharsets.UTF_8)).build();
     }
 
     /**
      * Returns a 405 Method Not Allowed response.
      * @param request
-     * @return {@link HttpResponse} with status code 405 and body "Method: ... not allowed with target: ..."
+     * @return {@link Response} with status code 405 and body "Method: ... not allowed with target: ..."
      */
-    public HttpResponse methodNotAllowed(HttpRequest request) {
-        return new HttpResponse(HttpStatus.METHOD_NOT_ALLOWED, "text/plain", "keep-alive",
-                ("Method: " + request.getMethod() + " not allowed with target: " + request.getTarget()).getBytes(StandardCharsets.UTF_8));
+    public Response methodNotAllowed(HttpRequest request) {
+//        return new HttpResponse(HttpStatus.METHOD_NOT_ALLOWED, "text/plain", "keep-alive",
+//                ("Method: " + request.getMethod() + " not allowed with target: " + request.getTarget()).getBytes(StandardCharsets.UTF_8));
+        return new Response.Builder()
+                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(("Method: " + request.getMethod() + " not allowed with target: " + request.getTarget()).getBytes(StandardCharsets.UTF_8))
+                .build();
     }
 
     //Getters and setters
