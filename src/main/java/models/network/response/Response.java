@@ -98,7 +98,6 @@ public class Response {
                     "Content-Type: " + this.contentType + CRLF +
                     "Content-Length: " + this.contentLength + CRLF +
                     CRLF;
-            //System.out.println(this.response);
 
             this.responseBytes = this.response.getBytes(StandardCharsets.UTF_8);
         }
@@ -106,7 +105,6 @@ public class Response {
         private void createStatusLine() {
             String httpVersion = "HTTP/1.1";
             this.statusLine = httpVersion + " " + status.getCode() + " " + status.getReasonPhrase() + CRLF;
-            //System.out.println(this.statusLine);
         }
     }
 

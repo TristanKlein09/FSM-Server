@@ -42,14 +42,12 @@ public class HttpResponse {
                 "Content-Type: " + this.contentType + CRLF +
                 "Content-Length: " + this.contentLength + CRLF +
                 CRLF;
-        //System.out.println(this.response);
 
         this.responseBytes = this.response.getBytes(StandardCharsets.UTF_8);
     }
 
     private void createStatusLine() {
         this.statusLine = httpVersion + " " + status.getCode() + " " + status.getReasonPhrase() + CRLF;
-        //System.out.println(this.statusLine);
     }
 
     //Getters and setters
