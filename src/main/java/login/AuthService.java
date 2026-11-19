@@ -26,7 +26,7 @@ public class AuthService {
     public boolean authenticate(String username, String password) throws SQLException, ExecutionException, InterruptedException {
         //Check if the username exists in the database, if it does not, return false
         SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
-        Connection usersConnection = connectionProvider.connectToDb(SQLDatabaseConnectionProvider.usersDbUrl);
+        Connection usersConnection = connectionProvider.connectToDb(SQLDatabaseConnectionProvider.dbUrl);
         //Works by running a select query and checks how many rows are returned, if it is 0, the username does not exist
         String checkUsernameExists = "SELECT 1 FROM userLogins WHERE username = (?) LIMIT 1"; //Only return one row
         assert usersConnection != null; //usersConnection cannot be null
@@ -42,7 +42,7 @@ public class AuthService {
 
 
         //Get the hashed password from the database that corresponds to the username
-        Connection usersConnection2 = connectionProvider.connectToDb(SQLDatabaseConnectionProvider.usersDbUrl);
+        Connection usersConnection2 = connectionProvider.connectToDb(SQLDatabaseConnectionProvider.dbUrl);
         String getHashedPass = "SELECT password_hash FROM userLogins WHERE username = (?)";
         assert usersConnection2 != null; //usersConnection cannot be null
         PreparedStatement prepStmtGetHashedPass = usersConnection2.prepareStatement(getHashedPass);
@@ -68,7 +68,7 @@ public class AuthService {
         if (user.getId() != 0) return null; //0 is the default value for int, so if it is not 0, the user already exists
         try {
             SQLDatabaseConnectionProvider connectionProvider = new SQLDatabaseConnectionProvider();
-            Connection usersConnection = connectionProvider.connectToDb(SQLDatabaseConnectionProvider.usersDbUrl);
+            Connection usersConnection = connectionProvider.connectToDb(SQLDatabaseConnectionProvider.dbUrl);
 
             //Inserting into userLogins table
             //Question marks are placeholders for prepared statement to prevent SQL injection

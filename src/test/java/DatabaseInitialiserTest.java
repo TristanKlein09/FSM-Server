@@ -21,8 +21,13 @@ public class DatabaseInitialiserTest {
         DatabaseInitialiser init = new SQLDatabaseInitialiser();
         init.initDatabase();
 
+        //Check users and userLogins table has been done correctly
         assertEquals("admin", TestHelper.getValueFromDb(this.url,"SELECT username FROM userLogins"));
         assertEquals("Admin", TestHelper.getValueFromDb(this.url, "SELECT first_name FROM users"));
+        //Check address and jobs has been done correctly
+        assertEquals(0, TestHelper.countRows(this.url,"jobs"));
+        assertEquals(0, TestHelper.countRows(this.url, "addresses"));
+
     }
 
     //Boundary: initDatabase() is called twice, so should only create one copy of the table
@@ -33,7 +38,11 @@ public class DatabaseInitialiserTest {
         init.initDatabase();
         init.initDatabase();
 
+        //Check users and userLogins table has been done correctly
         assertEquals("admin", TestHelper.getValueFromDb(this.url,"SELECT username FROM userLogins"));
         assertEquals("Admin", TestHelper.getValueFromDb(this.url, "SELECT first_name FROM users"));
+        //Check address and jobs has been done correctly
+        assertEquals(0, TestHelper.countRows(this.url,"jobs"));
+        assertEquals(0, TestHelper.countRows(this.url, "addresses"));
     }
 }

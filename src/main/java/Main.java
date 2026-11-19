@@ -1,3 +1,5 @@
+import database.implementations.SQLDatabaseInitialiser;
+import database.interfaces.DatabaseInitialiser;
 import server.HttpServer;
 
 import java.io.*;
@@ -9,6 +11,11 @@ import java.util.concurrent.ExecutionException;
 
 public class Main {
     public static void main(String[] args) throws IOException, SQLException, ExecutionException, InterruptedException {
+        //Initialise databases
+        DatabaseInitialiser initialiser = new SQLDatabaseInitialiser();
+        initialiser.initDatabase();
+
+        //Start server
         HttpServer server = HttpServer.getInstance();
         server.startServer();
     }

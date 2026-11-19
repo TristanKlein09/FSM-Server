@@ -7,9 +7,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class SQLDatabaseConnectionProvider implements DatabaseConnectionProvider {
-    public static String usersDbUrl = "jdbc:sqlite:users.sqlite";
+    public static String dbUrl = "jdbc:sqlite:users.sqlite";
 
-    public void setUsersDbUrl(String url) { usersDbUrl = url; }
+    public void setUsersDbUrl(String url) { dbUrl = url; }
 
     @Override
     public Connection connectToDb(String url) throws SQLException {

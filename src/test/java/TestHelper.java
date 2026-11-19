@@ -110,6 +110,10 @@ public class TestHelper {
         return Integer.parseInt(getValue("SELECT COUNT(*) FROM " + table));
     }
 
+    public static int countRows(String url, String table) throws Exception {
+        return Integer.parseInt(getValueFromDb(url, "SELECT COUNT(*) FROM " + table));
+    }
+
 
     // Runs a SELECT on the test database and returns the first column of the first row
     public static String getValue(String sql) throws Exception {
