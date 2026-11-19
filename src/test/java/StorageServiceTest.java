@@ -10,9 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StorageServiceTest {
-    //Checks if the data directory has been created correctly
+    //Checks if the data directory and sub all subdirectories have been created correctly
     @Test
     @Order(1)
     @DisplayName("Sto1: Correct initialisation of the data directory (valid)")
@@ -20,7 +21,8 @@ public class StorageServiceTest {
         StorageService storageService = new LocalStorageService();
         storageService.init();
 
-        assertEquals(true, Files.exists(Path.of("data")));
+        assertTrue(Files.exists(Path.of("data")));
+        assertTrue(Files.exists(Path.of("data/forms")));
     }
 
     //Creates a file with text in it and checks if the file has been

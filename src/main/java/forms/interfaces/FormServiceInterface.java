@@ -3,9 +3,11 @@ package forms.interfaces;
 public interface FormServiceInterface {
     //Create a form - form builder
     //Create form must also link the form to the job
-    public void createJob();
+    void createForm(String name, String content);
 
-    //Update the fields in the form
+    //Update a specific field in the form
+    void updateForm();
 
     //Get the form via Http request using target
+    void requestForm();
 }

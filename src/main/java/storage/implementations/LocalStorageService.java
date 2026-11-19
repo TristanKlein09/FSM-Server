@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 public class LocalStorageService implements StorageService {
     private Path dataDir;
+    private Path formsDir;
 
     /**
      * Initialises the 'data' file directory
@@ -17,7 +18,10 @@ public class LocalStorageService implements StorageService {
     public void init() throws IOException {
         //Initialises the data directory
         this.dataDir = Path.of("data");
+        this.formsDir = Path.of("data/forms");
+
         Files.createDirectories(this.dataDir);
+        Files.createDirectories(this.formsDir);
     }
 
     /**
