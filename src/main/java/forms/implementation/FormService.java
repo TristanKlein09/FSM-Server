@@ -12,6 +12,12 @@ import java.io.IOException;
 public class FormService implements FormServiceInterface {
     //Create a form - form builder
     //TODO: Link form to job when creating the job
+
+    /**
+     * Creates a form in the data/forms directory
+     * @param name Name of the form to be created
+     * @param content Contents of the form
+     */
     @Override
     public void createForm(String name, String content) {
         try {
@@ -28,6 +34,15 @@ public class FormService implements FormServiceInterface {
     //Overwrite the file
 
     //Updates a specific field in the form
+
+    /**
+     * Updates the value of the field in the specified form
+     * @param name The name of the form to update
+     * @param key The JSON key whose value will be updated
+     * @param value The new value to update to
+     * @throws IOException Thrown by {@link StorageService} if an error has occurred with
+     * the file
+     */
     @Override
     public void updateForm(String name, String key, String value) throws IOException {
         String pathStr = LocalStorageService.formsDirStr + "/" + name + ".json";
