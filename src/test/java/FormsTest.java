@@ -1,3 +1,5 @@
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import forms.implementation.FormService;
 import forms.interfaces.FormServiceInterface;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FormsTest {
     //Resets the data dir before each test
@@ -30,5 +33,21 @@ public class FormsTest {
         formService.createForm("testForm", "Test form");
 
         assertEquals("Test form", Files.readString(Path.of("data/forms/testForm.json")));
+    }
+
+    @Test
+    @DisplayName("F2: Form updated successfully (valid)")
+    void updateForm() throws IOException {
+        //Create contents of the form
+        JsonObject formJson = new JsonObject();
+        formJson.addProperty("Test field 1", "Value 1");
+        formJson.addProperty("Test field 2", "Value 2");
+        String json = new Gson().toJson(formJson);
+
+        FormServiceInterface formService = new FormService();
+        formService.createForm("testForm", json);
+        formService.updateForm("testForm", "Test field 1", "Updated value");
+
+        assertTrue(Files.readString(Path.of("data/forms/testForm.json")).contains("Updated value"));
     }
 }
