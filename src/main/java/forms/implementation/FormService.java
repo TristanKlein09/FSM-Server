@@ -73,14 +73,22 @@ public class FormService implements FormServiceInterface {
 
     }
 
-    @Override
-    public void requestForm() {
-        //Return a String (maybe a generic json object and its converted when about to be sent)
-
-    }
-
-
     //Update the fields in the form
-
     //Get the form via Http request using target
+    @Override
+    public String requestForm(String name) throws IOException {
+        //Return a String (maybe a generic json object and its converted when about to be sent)
+        StorageService storageService = new LocalStorageService();
+        String pathStr = LocalStorageService.formsDirStr + "/" + name + ".json";
+        String content = "";
+        try {
+            content = storageService.readFile(pathStr);
+            return content;
+        } catch (IOException e) {
+            //TODO: Send response to client that an error has occurred
+            e.printStackTrace();
+        }
+
+        return content;
+    }
 }

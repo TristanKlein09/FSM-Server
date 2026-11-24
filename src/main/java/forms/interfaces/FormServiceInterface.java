@@ -26,5 +26,5 @@ public interface FormServiceInterface {
     void updateForm(String name, String key, String value) throws IOException;
 
     //Get the form via Http request using target
-    void requestForm();
+    String requestForm(String name) throws IOException;
 }

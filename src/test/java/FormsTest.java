@@ -50,4 +50,15 @@ public class FormsTest {
 
         assertTrue(Files.readString(Path.of("data/forms/testForm.json")).contains("Updated value"));
     }
+
+    @Test
+    @DisplayName("F3: Form is requested successfully")
+    void requestForm() throws IOException {
+        FormServiceInterface formService = new FormService();
+        StorageService storageService = new LocalStorageService();
+        storageService.createFile("data/forms/testForm.json", "Test form");
+
+        String content = formService.requestForm("testForm");
+        assertEquals("Test form", content);
+    }
 }
