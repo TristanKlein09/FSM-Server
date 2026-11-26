@@ -8,7 +8,10 @@ import java.nio.file.Path;
 
 public class LocalStorageService implements StorageService {
     private Path dataDir;
+    private Path formsDir;
 
+    public static final String dataDirStr = "data";
+    public static final String formsDirStr = "data/forms";
     /**
      * Initialises the 'data' file directory
      * @throws IOException thrown if there has been an issue creating the directory
@@ -16,8 +19,11 @@ public class LocalStorageService implements StorageService {
     @Override
     public void init() throws IOException {
         //Initialises the data directory
-        this.dataDir = Path.of("data");
+        this.dataDir = Path.of(this.dataDirStr);
+        this.formsDir = Path.of(this.formsDirStr);
+
         Files.createDirectories(this.dataDir);
+        Files.createDirectories(this.formsDir);
     }
 
     /**
@@ -58,15 +64,5 @@ public class LocalStorageService implements StorageService {
         Path path = Path.of(pathStr);
 
         return Files.readString(path);
-    }
-
-
-    //Getters and setters
-    public Path getDataDir() {
-        return dataDir;
-    }
-
-    public void setDataDir(Path dataDir) {
-        this.dataDir = dataDir;
     }
 }
